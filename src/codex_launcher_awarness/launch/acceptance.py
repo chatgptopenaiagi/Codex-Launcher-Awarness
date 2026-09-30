@@ -39,6 +39,7 @@ public static class CLAConsoleCheck {
   }
   [DllImport("kernel32.dll", SetLastError=true)] public static extern IntPtr GetStdHandle(int value);
   [DllImport("kernel32.dll", SetLastError=true)] public static extern bool GetConsoleMode(IntPtr handle, out UInt32 mode);
+  [DllImport("kernel32.dll", SetLastError=true)] public static extern bool FlushConsoleInputBuffer(IntPtr input);
   [DllImport("kernel32.dll", SetLastError=true)] public static extern bool WriteConsoleInputW(IntPtr input, [In] InputRecord[] records, UInt32 count, out UInt32 written);
   public static bool IsConsole(int stream) { UInt32 mode; return GetConsoleMode(GetStdHandle(stream), out mode); }
   public static string OwnInputRoundtrip() {
@@ -51,9 +52,16 @@ public static class CLAConsoleCheck {
       records[index].VirtualKey=(UInt16)(marker[index]=='\r' ? 13 : 0);
     }
     UInt32 written;
+    // This newly created fake console can receive focus/keyboard events while
+    // Add-Type compiles. Discard its own queued input immediately before the
+    // single marker batch; never attach to or flush another console.
+    if (!FlushConsoleInputBuffer(GetStdHandle(-10)))
+      throw new InvalidOperationException("Could not clear the fake process's own input buffer.");
     if (!WriteConsoleInputW(GetStdHandle(-10), records, (UInt32)records.Length, out written) || written != records.Length)
       throw new InvalidOperationException("Could not write the fixed marker to the fake process's own input handle.");
-    return Console.ReadLine();
+    string line = Console.ReadLine();
+    // Keep unexpected keystrokes out of local diagnostic artifacts too.
+    return line == "CLA_INPUT_OK" ? line : "[unexpected console input redacted]";
   }
 }
 '@

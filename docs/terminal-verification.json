@@ -8,6 +8,19 @@
   },
   "observed_failures": [
     {
+      "id": "fake-console-queued-input",
+      "classification": "visible console acceptance fixture input isolation defect; production launcher unaffected",
+      "status": "FIXED_SOURCE_RETEST_PASS_FROZEN_RETEST_PENDING",
+      "failed_frozen_run_id": "887836ddaebd4ff59a6c3cfe89df45af",
+      "cwd": "<private CLA acceptance project>",
+      "redacted_argv": ["<trusted-pwsh.exe>", "-NoLogo", "-NoProfile", "-File", "<CLA-owned-bootstrap.ps1>", "-Manifest", "<private fake-launch manifest>"],
+      "stdio": "CREATE_NEW_CONSOLE; all three handles were genuine console handles",
+      "failure": "The fixed marker was delivered intact but three queued characters preceded it, so exact Console.ReadLine verification correctly failed. No TERM issue was established.",
+      "fix": "Flush only the new fake child's own input buffer immediately before its single WriteConsoleInputW marker batch. Retain only the expected marker or a redacted mismatch sentinel, never unexpected raw keystrokes.",
+      "source_retest_run_id": "88ed07d90a23409c8a2da865f82978aa",
+      "model_calls": 0
+    },
+    {
       "id": "wrapper-array-not-splat",
       "classification": "discovery/configuration probe argument-delivery defect",
       "status": "FIXED_AND_VERIFIED",
@@ -59,7 +72,7 @@
   ],
   "visible_console_acceptance": {
     "status": "PASS_SOURCE_RUNTIME",
-    "run_id": "d76db6d7bcd9494293a76696d7bc55bd",
+    "run_id": "88ed07d90a23409c8a2da865f82978aa",
     "cwd": "<private CLA acceptance project>",
     "redacted_argv": ["<trusted-pwsh.exe>", "-NoLogo", "-NoProfile", "-File", "<CLA-owned-bootstrap.ps1>", "-Manifest", "<private fake-launch manifest>"],
     "stdio": "CREATE_NEW_CONSOLE; all three standard handles verified with GetConsoleMode; stdout and stderr write checks completed",
@@ -67,7 +80,7 @@
     "correct_project": "PASS",
     "second_launch_of_same_prepared_session": "BLOCKED_AS_EXPECTED",
     "child_finished_after_creator_process_exited": "PASS",
-    "input_roundtrip": "PASS; fixed marker written with WriteConsoleInputW only to the fake child's own input handle and read back with Console.ReadLine; no other console attached",
+    "input_roundtrip": "PASS; only the new fake child's own input buffer is flushed, then the fixed marker is written with WriteConsoleInputW and read back with Console.ReadLine; no other console attached; unexpected input redacted",
     "test_only_difference": "Omitted -NoExit so the fixed four-second fake terminal closes itself",
     "elevation": "Existing elevated token explicitly allowed for this fake acceptance only",
     "frozen_runtime": "NOT_RUN in this record; repeat after final rebuild",

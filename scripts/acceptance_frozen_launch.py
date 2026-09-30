@@ -55,7 +55,7 @@ def finish_console_acceptance(started: dict, owner_exit_time: datetime) -> dict:
                "status": "PASS" if all(checks.values()) else "FAIL", "frozen": started.get("frozen"),
                "checks": checks, "model_calls": 0, "codex": "fixed fake PowerShell executable",
                "input_roundtrip": "PASS" if checks["stdin_readline_roundtrip"] else "FAIL",
-               "input_scope": "Fixed marker written through WriteConsoleInputW only to the fake child own stdin handle, then read by Console.ReadLine; no other console attached",
+               "input_scope": "Only the fake child own stdin buffer is flushed, then a fixed marker is written with WriteConsoleInputW and read by Console.ReadLine; no other console attached; unexpected input redacted",
                "child_elevated_by_explicit_test_opt_in": payload.get("elevated"),
                "launch": {"cwd": "<private-CLA-acceptance-project>",
                           "argv": ["<selected-pwsh.exe>", "-NoLogo", "-NoProfile", "-File", "<CLA-owned-bootstrap.ps1>", "-Manifest", "<private-launch.json>"],

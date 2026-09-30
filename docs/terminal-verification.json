@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "classification": "Sanitized engineering acceptance records; no real Codex model session represented",
+  "older_user_referenced_failures": {
+    "status": "FIXED; original traceback unavailable",
+    "cases": ["test_service_response_redacts_metadata", "test_service_malformed_and_cancel"],
+    "reason": "Retained implementation notes identify fixture drift while the provider switched urllib.request to http.client. Fixtures were updated to HTTPConnection/read1. Existing XML establishes a later 97-test pass and a subsequent 103-test run with one different Unicode-wrapper failure. No missing exception text is invented."
+  },
+  "observed_failures": [
+    {
+      "id": "wrapper-array-not-splat",
+      "classification": "discovery/configuration probe argument-delivery defect",
+      "status": "FIXED_AND_VERIFIED",
+      "cwd": "<CLA-repository-root>",
+      "redacted_argv": [
+        "<trusted-pwsh.exe>", "-NoLogo", "-NoProfile", "-NonInteractive", "-EncodedCommand",
+        "<fixed escaped wrapper invocation: cla_awareness session overrides followed by mcp list --json>"
+      ],
+      "intended_codex_argv": [
+        "-c", "mcp_servers.cla_awareness.command=<actual CLA runtime as TOML string>",
+        "-c", "mcp_servers.cla_awareness.args=<actual CLA runtime argument array>",
+        "-c", "mcp_servers.cla_awareness.enabled=true",
+        "-c", "mcp_servers.cla_awareness.required=true",
+        "-c", "mcp_servers.cla_awareness.startup_timeout_sec=20.0",
+        "-c", "mcp_servers.cla_awareness.env.CLA_PROJECT_ROOT=<approved project>",
+        "-c", "mcp_servers.cla_awareness.env.CLA_SESSION_ID=<32-character session ID>",
+        "mcp", "list", "--json"
+      ],
+      "stdio": "stdin=DEVNULL; stdout/stderr=bounded pipes; CREATE_NO_WINDOW",
+      "failure": "The .ps1 shim received one nested array argument rather than separate arguments; Codex entered its TUI path and refused TERM=dumb.",
+      "fix": "Use a named typed string array and @claProbeArguments splatting.",
+      "verification": "A real PowerShell fake wrapper confirms separate exact arguments. Installed Codex mcp list --json returns the expected enabled CLA stdio record with unchanged configuration hash.",
+      "mcp_handshake": "NOT_RUN; configuration inventory is not a handshake",
+      "model_calls": 0
+    },
+    {
+      "id": "wrapper-unicode-stdout",
+      "classification": "discovery probe output encoding defect",
+      "status": "FIXED_AND_VERIFIED",
+      "cwd": "<isolated test directory>",
+      "redacted_argv": ["<trusted-pwsh.exe>", "-NoLogo", "-NoProfile", "-NonInteractive", "-EncodedCommand", "<fixed fake-wrapper argument probe>"],
+      "stdio": "stdin=DEVNULL; stdout/stderr=bounded pipes; CREATE_NO_WINDOW",
+      "failure": "Unicode output became question marks under the child console's default encoding.",
+      "fix": "Set Console.OutputEncoding and OutputEncoding to UTF-8 only inside the owned probe child.",
+      "verification": "Exact Unicode argument regression test passes; no parent environment or encoding configuration is changed."
+    },
+    {
+      "id": "restricted-token-experiment",
+      "classification": "Windows token/terminal compatibility experiment with a fixed fake program",
+      "status": "FAILED_EXPERIMENT_REMOVED",
+      "cwd": "<private CLA acceptance project>",
+      "redacted_argv": ["<trusted-pwsh.exe>", "-NoLogo", "-NoProfile", "-File", "<CLA-owned-bootstrap.ps1>", "-Manifest", "<private fake-launch manifest>"],
+      "stdio": "CREATE_NO_WINDOW; no actual Codex executable selected",
+      "failure": "Creating a restricted medium token succeeded, but PowerShell exited before bootstrap with 0xC0000142 (DLL initialization failure). The exact underlying Windows policy/ACL cause was not established.",
+      "resolution": "The experiment was removed from production. When CLA and the desktop shell are both elevated, default launch refuses. Explicit per-launch administrator-token inheritance is available with a warning; no Windows security setting is changed.",
+      "unelevated_live_launch_on_this_host": "BLOCKED",
+      "model_calls": 0
+    }
+  ],
+  "visible_console_acceptance": {
+    "status": "PASS_SOURCE_RUNTIME",
+    "run_id": "d76db6d7bcd9494293a76696d7bc55bd",
+    "cwd": "<private CLA acceptance project>",
+    "redacted_argv": ["<trusted-pwsh.exe>", "-NoLogo", "-NoProfile", "-File", "<CLA-owned-bootstrap.ps1>", "-Manifest", "<private fake-launch manifest>"],
+    "stdio": "CREATE_NEW_CONSOLE; all three standard handles verified with GetConsoleMode; stdout and stderr write checks completed",
+    "exact_prompt_and_arguments": "PASS",
+    "correct_project": "PASS",
+    "second_launch_of_same_prepared_session": "BLOCKED_AS_EXPECTED",
+    "child_finished_after_creator_process_exited": "PASS",
+    "input_roundtrip": "PASS; fixed marker written with WriteConsoleInputW only to the fake child's own input handle and read back with Console.ReadLine; no other console attached",
+    "test_only_difference": "Omitted -NoExit so the fixed four-second fake terminal closes itself",
+    "elevation": "Existing elevated token explicitly allowed for this fake acceptance only",
+    "frozen_runtime": "NOT_RUN in this record; repeat after final rebuild",
+    "model_calls": 0
+  }
+}

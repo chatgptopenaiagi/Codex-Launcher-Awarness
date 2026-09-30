@@ -1,0 +1,13 @@
+# Synthetic example. Configure actual trusted paths through CLA on your PC.
+schema_version = 1
+approved_project_roots = []
+local_endpoints = []
+python_environments = []
+engine_volumes = []
+probe_timeout_seconds = 4
+max_output_bytes = 32768
+cache_seconds = 30
+briefing_max_chars = 6000
+probe_enabled = false
+[trusted_executables]
+[engine_paths]
